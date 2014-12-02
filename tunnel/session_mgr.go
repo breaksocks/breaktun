@@ -16,24 +16,22 @@ func NewSessionManager() *SessionManager {
 	return mgr
 }
 
-func (mgr *SessionManager) NewSession(addr string, ctx *CipherContext) (*Session, error) {
-	session_id, err := ctx.MakeSessionId()
-	if err != nil {
-		return nil, err
-	}
-
-	session := &Session{}
-	session.Id = session_id
-	session.RemoteAddr = addr
+func (mgr *SessionManager) NewSession(addr string) *Session {
+	session := NewSession("", addr)
 
 	mgr.lock.Lock()
-	mgr.sessions[session_id] = session
 	mgr.reftable[addr] = session
 	mgr.lock.Unlock()
 	return session, nil
 }
 
-func (mgr *SessionManager) GetSession(sid SessionId) *Session {
+func (mgr *SessionManager) SessionFeedId(session *Session, sid SessionId) {
+	mgr.lock.Lock()
+	mgr.sessions[sid] = session
+	mgr.lock.Unlock()
+}
+
+func (mgr *SessionManager) GetSessionById(sid SessionId) *Session {
 	mgr.lock.RLock()
 	session := mgr.sessions[sid]
 	mgr.lock.RUnlock()

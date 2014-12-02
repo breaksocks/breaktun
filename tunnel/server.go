@@ -38,17 +38,10 @@ func (ser *Server) Run() {
 
 		addr := cliaddr.String()
 		if session := ser.mgr.GetSessionByAddr(addr); session != nil {
-			ser.process(session, buf[:n])
+			session.write <- buf[:n]
 		} else {
-			go ser.newTun(addr, buf[:n])
+			session := ser.mgr.NewSession(addr)
+			session.write <- buf[:n]
 		}
 	}
-}
-
-func (ser *Server) process(session *Session, data []byte) {
-
-}
-
-func (ser *Server) newTun(addr string, data []byte) {
-
 }

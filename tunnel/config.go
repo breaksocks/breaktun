@@ -54,7 +54,7 @@ func LoadServerConfig(path string) (*ServerConfig, error) {
 	cfg.GlobalEncryptMethod = "3des-192"
 	cfg.GlobalEncryptPassword = "passwd"
 	cfg.LinkEncryptMethods = []string{"aes-256", "aes-192", "aes-128",
-		"3des-192", "rc4"}
+		"3des-192"}
 	cfg.KeyPath = defaultKeyPath
 	cfg.UserConfigPath = defaultUserConfigPath
 	if err := LoadYamlConfig(path, cfg); err != nil {
@@ -68,7 +68,7 @@ func LoadClientConfig(path string) (*ClientConfig, error) {
 	cfg.GlobalEncryptMethod = "3des-192"
 	cfg.GlobalEncryptPassword = "passwd"
 	cfg.LinkEncryptMethods = []string{"aes-256", "aes-192", "aes-128",
-		"3des-192", "rc4"}
+		"3des-192"}
 	if err := LoadYamlConfig(path, cfg); err != nil {
 		return nil, err
 	}

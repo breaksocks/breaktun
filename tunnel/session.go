@@ -24,4 +24,14 @@ type Session struct {
 	Username   string
 	cipherExg  *CipherExchange
 	cipherCfg  *CipherConfig
+
+	write chan []byte
+}
+
+func NewSession(sid SessionId, addr string) *Session {
+	session := new(Session)
+	session.Id = sid
+	session.RemoteAddr = addr
+	session.write = make([]byte, 1024)
+	return session
 }
