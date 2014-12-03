@@ -2,6 +2,7 @@ package tunnel
 
 import (
 	"encoding/base64"
+	"net"
 )
 
 type SessionId string
@@ -20,18 +21,25 @@ func (sid SessionId) size() int {
 
 type Session struct {
 	Id         SessionId
-	RemoteAddr string
+	RemoteAddr *net.UDPAddr
 	Username   string
 	cipherExg  *CipherExchange
 	cipherCfg  *CipherConfig
 
-	write chan []byte
+	dev           TunDev
+	writeToTun    chan []byte
+	writeToClient chan []byte
 }
 
-func NewSession(sid SessionId, addr string) *Session {
+func NewSession(sid SessionId, addr *net.UDPAddr) *Session {
 	session := new(Session)
 	session.Id = sid
 	session.RemoteAddr = addr
-	session.write = make([]byte, 1024)
+	session.writeToTun = make([]byte, 1024)
+	session.writeToClient = make([]byte, 1024)
 	return session
+}
+
+func (session *Session) Run() {
+
 }

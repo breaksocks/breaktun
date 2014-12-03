@@ -28,6 +28,10 @@ func NewServer(cfg *ServerConfig) (*Server, error) {
 	}
 }
 
+func (ser *Server) Close() error {
+	return ser.conn.Close()
+}
+
 func (ser *Server) Run() {
 	for {
 		buf := make([]byte, 2048)
@@ -38,10 +42,25 @@ func (ser *Server) Run() {
 
 		addr := cliaddr.String()
 		if session := ser.mgr.GetSessionByAddr(addr); session != nil {
-			session.write <- buf[:n]
+			session.writeToTun <- buf[:n]
 		} else {
-			session := ser.mgr.NewSession(addr)
-			session.write <- buf[:n]
+			session := ser.mgr.NewSession(cliaddr)
+			session.writeToTun <- buf[:n]
+			go ser.tunWriteBack(addr, session.writeToClient)
+			go session.Run()
+		}
+	}
+}
+
+func (ser *Server) tunWriteBack(addr *net.UDPAddr, write chan []byte) {
+	for {
+		if data, ok := <-write; ok {
+			if _, err := ser.conn.WriteToUDP(data, addr); err != nil {
+				glog.Errorf("conn write fail: %v", err)
+				break
+			}
+		} else {
+			break
 		}
 	}
 }

@@ -16,7 +16,7 @@ func NewSessionManager() *SessionManager {
 	return mgr
 }
 
-func (mgr *SessionManager) NewSession(addr string) *Session {
+func (mgr *SessionManager) NewSession(addr *net.UDPAddr) *Session {
 	session := NewSession("", addr)
 
 	mgr.lock.Lock()
