@@ -8,16 +8,19 @@ type SessionManager struct {
 	lock     sync.RWMutex
 	sessions map[SessionId]*Session
 	reftable map[string]*Session
+	exit     chan *Session
 }
 
 func NewSessionManager() *SessionManager {
 	mgr := &SessionManager{}
 	mgr.sessions = make(map[SessionId]*Session)
+	mgr.exit = make(chan *Session, 64)
 	return mgr
 }
 
 func (mgr *SessionManager) NewSession(addr *net.UDPAddr) *Session {
 	session := NewSession("", addr)
+	session.exit = mgr.exit
 
 	mgr.lock.Lock()
 	mgr.reftable[addr] = session
@@ -61,4 +64,14 @@ func (mgr *SessionManager) DelSession(session *Session) {
 	delete(mgr.sessions, session.Id)
 	delete(mgr.reftable, session.RemoteAddr)
 	mgr.lock.Unlock()
+}
+
+func (mgr *SessionManager) AutoDelSession() {
+	for {
+		if session, ok := <-mgr.exit; ok {
+			mgr.DelSession(session)
+		} else {
+			break
+		}
+	}
 }

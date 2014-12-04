@@ -61,3 +61,17 @@ func (req *RetryRequester) Request(data []byte) ([]byte, error) {
 	}
 	return nil, RequestTimeout
 }
+
+func (req *RetryRequester) RetryGet(max_retry int) ([]byte, error) {
+	for i := 0; i < max_retry; i += 1 {
+		select {
+		case rep, ok := <-req.read:
+			if ok {
+				return rep, nil
+			}
+			return nil, io.EOF
+		case <-time.After(time.Millisecond * req.timeout):
+		}
+	}
+	return nil, RequestTimeout
+}

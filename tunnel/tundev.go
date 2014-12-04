@@ -11,4 +11,5 @@ type TunDev interface {
 
 	Read(bs []byte) (int, error)
 	Write(bs []byte) (int, error)
+	Close() error
 }
