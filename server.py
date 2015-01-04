@@ -121,7 +121,7 @@ class TunServer(object):
 
     def on_tuns(self, fd, evs):
         cli = self.tun2clis[fd]
-        if evs | select.EPOLLERR:
+        if evs & select.EPOLLERR:
             logging.warn('tun on err')
             cli.tun.close()
             del self.tun2clis[fd]
