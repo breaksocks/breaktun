@@ -120,13 +120,15 @@ class TunServer(object):
         self.sock.sendto(data, addr)
 
     def on_tuns(self, fd, evs):
+        cli = self.tun2clis[fd]
         if evs | select.EPOLLERR:
             logging.warn('tun on err')
-            # TODO fix err
+            cli.tun.close()
+            del self.tun2clis[fd]
+            del self.addr2clis['%s:%d' % cli.addr]
             return
         data = os.read(fd, 2048)
         if data:
-            cli = self.tun2clis[fd]
             self.sock.sendto(self.enc.encrypt(PKT_PROXY, data), cli.addr)
 
 
@@ -134,5 +136,5 @@ if __name__ == '__main__':
     l = logging.getLogger()
     l.setLevel(logging.DEBUG)
     ser = TunServer('123', '0.0.0.0', 7780, {'lo': '123'},
-                    '192.168.1.1', '192.168.1.0/24')
+                    '192.168.11.1', '192.168.11.0/24')
     ser.run()

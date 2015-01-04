@@ -30,3 +30,6 @@ class TunDev(object):
 
     def write(self, data):
         return os.write(self.tun, data)
+
+    def close(self):
+        os.close(self.tun)

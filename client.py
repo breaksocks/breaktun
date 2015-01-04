@@ -62,8 +62,9 @@ class TunClient(object):
                 else:
                     data = self.tun.read(65535)
                     self.sock.send(self.enc.encrypt(PKT_PROXY, data))
+                    print('sent', data)
 
 
 if __name__ == '__main__':
-    cli = TunClient('123', '127.0.0.1', 7780, 'lo', '123')
+    cli = TunClient('123', 'lovu', 7780, 'lo', '123')
     cli.run()
